@@ -1,0 +1,8 @@
+{
+  "laxcomma": true,
+  "eqeqeq": true,
+  "newcap": true,
+  "undef": true,
+  "node": true,
+  "validthis":true
+}

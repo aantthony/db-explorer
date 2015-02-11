@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #f8f8f8;
+  font-family: Helvetica;
+}
+
+* {
+  -webkit-user-select: none;
+}
+.grid {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  vertical-align: top;
+  width: 100%;
+  
+  selector {
+    position: absolute;
+    top: 0
+    left: 0;
+    width: 100px;
+    height: 32px;
+    border: 1px solid #08c;
+    input {
+      -webkit-user-select: text;
+      font-size: 13px;
+      font-family: Helvetica;
+      text-align: right;
+      border: none;
+      background: transparent;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      padding: 4px 8px;
+    }
+  }
+
+  table {
+    font-size: 13px;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-style: none;
+    border-spacing: 0;
+    width: 0;
+    cursor: default;
+    
+    -webkit-border-horizontal-spacing: 0px;
+    -webkit-border-vertical-spacing: 0px;
+
+  }
+
+  tr {
+    overflow: visible;
+    height: 32px;
+    direction: ltr;
+  }
+
+  td {
+    color: #000000;
+    text-align: right;
+    white-space: normal;
+    border-width: 0 1px 1px 0;
+    
+    overflow: hidden;
+    border: 1px #ccc solid;
+    border-color: rgba(0,0,0,0.08);
+    border-width: 0 1px 1px 0;
+    vertical-align: bottom;
+    line-height: inherit;
+    background-color: #fff;
+    padding: 8px 8px;
+    
+    width: 100px;
+    
+    &.selected {
+      border-color: red;
+    }
+  }
+  
+}
+
