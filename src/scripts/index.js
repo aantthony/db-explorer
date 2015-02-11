@@ -43,6 +43,10 @@ window.main = function () {
         table.left();
         return true;
       }
+      case KEYS.TAB: {
+        table.right();
+        return true;
+      }
       case KEYS.ARROW_RIGHT: {
         if (table.editing) {
           var inputNode = table.selector.input;
@@ -76,7 +80,15 @@ window.main = function () {
         break;
       }
       default: {
-        console.log('Key:', event.keyCode);
+        if (table.selector) {
+
+          var character = String.fromCharCode(event.keyCode);
+          if (character) {
+            var target = table.selector.target;
+            table.set(target.i, target.j, '');
+            table.edit();
+          }
+        }
       }
     }
   }

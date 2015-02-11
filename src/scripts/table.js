@@ -19,11 +19,12 @@ function Table() {
 
   var table = document.createElement('table');
   var tbody = document.createElement('tbody');
-  for(var i = 0; i < 305; i++) {
+  for(var i = 0; i < 35; i++) {
     var rowcells = [];
     var tr = document.createElement('tr');
     for(var j = 0; j < 15; j++) {
       var val = Math.floor(Math.random() * 4000);
+      val = '';
       var td = document.createElement('td');
       td.appendChild(document.createTextNode(val));
       td.i = i;
@@ -150,6 +151,11 @@ Table.prototype.down = function () {
 
 Table.prototype.set = function (i, j, value) {
   _setCellValue(this.cell(i, j), value);
+};
+
+Table.prototype.edit = function () {
+  if (!this.selector) return;
+  this.selector.input.focus();
 };
 
 Table.prototype.cancelEdit = function () {
