@@ -5,7 +5,7 @@ var stylus     = require('gulp-stylus');
 var source     = require('vinyl-source-stream');
 var browserify = require('browserify');
 
-var src = './src';   // Input files
+var src = './client';   // Input files
 var dist = './dist'; // Output files
 
 var paths = {
@@ -38,6 +38,11 @@ gulp.task('styles', function(){
   .pipe(gulp.dest(dist + '/styles/'));
 });
 
+gulp.task('lib.styles', function(){
+  return gulp.src('./node_modules/contextmenu/contextmenu.css')
+  .pipe(gulp.dest(dist + '/styles/'));
+});
+
 gulp.task('watch', function () {
   gulp.watch(paths.other, ['other']);
   gulp.watch(paths.html, ['html']);
@@ -60,5 +65,5 @@ gulp.task('server', function () {
   });
 });
 
-gulp.task('build', ['scripts', 'images', 'styles', 'html'], function () {});
+gulp.task('build', ['scripts', 'images', 'styles', 'lib.styles', 'html'], function () {});
 gulp.task('default', ['build', 'server', 'watch'], function() {});

@@ -3,26 +3,26 @@
 console.log('%cdb-explorer', 'font-size: 24px');
 
 var Table = require('./table');
+var TableManager = require('./tablemanager');
+var DataSource = require('./datasource');
 
 var table = new Table();
 
-window.main = function () {
+var tableController = new TableManager();
+var KEYS = require('./keys');
 
-  var t = document.getElementById('table');
+var dataSource = new DataSource();
+
+window.main = function (t) {
+
   t.appendChild(table.element);
+  table.delegate = tableController;
 
-  var KEYS = {
-    BACKSPACE: 8,
-    TAB: 9,
-    ESC: 27,
-    ARROW_LEFT: 37,
-    ARROW_UP: 38,
-    ARROW_RIGHT: 39,
-    ARROW_DOWN: 40,
-    SPACEBAR: 32,
-    ENTER: 13,
-    DELETE: 46
-  };
+  tableController.dataSource = dataSource;
+
+  tableController.table = table;
+    
+  tableController.show();
 
   function handleKey(event) {
     switch (event.keyCode) {
@@ -79,10 +79,14 @@ window.main = function () {
         }
         break;
       }
+      case KEYS.SHIFT: {
+        break;
+      }
       default: {
         if (table.selector) {
 
           var character = String.fromCharCode(event.keyCode);
+
           if (character) {
             var target = table.selector.target;
             table.set(target.i, target.j, '');

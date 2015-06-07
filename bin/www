@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+'use strict';
+
+var async = require('async');
+
+// Configure process:
+require('http').globalAgent.maxSockets = 10;
+require('https').globalAgent.maxSockets = 10;
+process.title = 'db-explorer:www';
+
+var server   = require('../lib/app/server');
+var database = require('../lib/inf/database');
+
+exports.main = async.series.bind(null, [
+  server.start,
+  database.start
+]);
+
+if (require.main === module) {
+  exports.main(function (err) {
+    if (err) throw err;
+  });
+}

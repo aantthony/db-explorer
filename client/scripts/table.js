@@ -1,5 +1,6 @@
 'use strict';
 
+var ContextMenu = require('contextmenu');
 module.exports = Table;
 
 function makeSelector() {
@@ -11,6 +12,9 @@ function makeSelector() {
   return element;
 }
 
+/**
+ * Infinite editable table canvas
+ */
 function Table() {
   this.element = document.createElement('div');
   this._selector = makeSelector();
@@ -19,7 +23,7 @@ function Table() {
 
   var table = document.createElement('table');
   var tbody = document.createElement('tbody');
-  for(var i = 0; i < 35; i++) {
+  for(var i = 0; i < 50; i++) {
     var rowcells = [];
     var tr = document.createElement('tr');
     for(var j = 0; j < 15; j++) {
@@ -39,23 +43,64 @@ function Table() {
   table.appendChild(tbody);
   this.element.appendChild(table);
 
+  this.table = table;
+
   table.addEventListener('mousedown', _mousedown.bind(this));
+  table.addEventListener('mouseup', _mouseup.bind(this));
+  table.addEventListener('mousemove', _mousemove.bind(this));
+
   table.addEventListener('keydown', _keydown.bind(this));
   this._selector.addEventListener('focus', _focusSelector.bind(this), true);
   this._selector.addEventListener('blur', _blurSelector.bind(this), true);
 }
 
+Table.prototype.start = function () {
+
+  var menu = ContextMenu([
+    {label: 'Add Row Above'},
+    {label: 'Add Row Below'},
+    {hr: true},
+    {label: 'Add Column Before'},
+    {label: 'Add Column After'},
+    {hr: true},
+    {label: 'Delete Row'},
+    {label: 'Delete Column'},
+    {hr: true},
+    {label: 'Cut'},
+    {label: 'Copy'},
+    {label: 'Paste'},
+    {label: 'Clear All'},
+    {hr: true},
+    {label: 'Wrap Text in Cell', checked: true}
+  ]);
+
+  ContextMenu.attach(this.table, menu);
+
+};
+
 function px(n) {
   return n + 'px';
 }
 
+function _mouseup(event) {
+  var td = event.target;
+  _setSelector.call(this, td, this._selectionStart);
+  if (this._selectionStart === td) {
+    this._selector.style.pointerEvents = '';
+  }
+  this._selectionStart = null;
+}
 function _mousedown(event) {
   var td = event.target;
-  while (td.nodeName !== 'TD') {
-    td = td.td;
-    if (!td) return console.log(event.target);
-  }
+  this._selectionStart = td;
   _setSelector.call(this, td);
+  this._selector.style.pointerEvents = 'none';
+}
+function _mousemove(event) {
+  var s = this._selectionStart;
+  if (!s) return;
+  var td = event.target;
+  _setSelector.call(this, td, s);
 }
 
 function _keydown(event) {
@@ -86,14 +131,38 @@ function _unsetEditing(alreadyBlurred, cancel) {
   }
 }
 
-function _setSelector(td) {
+function extendRects(r1, r2) {
+  var rect = {
+    top: Math.min(r1.top, r2.top),
+    left: Math.min(r1.left, r2.left)
+  };
+
+  rect.width  = Math.max(r1.left + r1.width,  r2.left + r2.width)  - rect.left;
+  rect.height = Math.max(r1.top  + r1.height, r2.top  + r2.height) - rect.top;
+
+  return rect;
+}
+
+function _setSelector(td, td2) {
+
+  var shouldSelect = this.delegate.tableShouldSelect(this, td.i, td.j, td);
+  if (!shouldSelect) return;
+
   if (this.editing) {
     this.finishEdit();
   }
+
   var base = this.element.getBoundingClientRect();
   var rect = td.getBoundingClientRect();
+
+  if (td2 && td2 !== td) {
+    var rect2 = td2.getBoundingClientRect();
+    rect = extendRects(rect, rect2);
+  }
+
   var selector = this._selector;
   var margin = 2;
+
   selector.style.top = px(rect.top - base.top - 1 - margin);
   selector.style.left = px(rect.left - base.left - 1 - margin);
   selector.style.width = px(rect.width - 1 + 2 * margin);
@@ -118,6 +187,17 @@ Table.prototype.cell = function (i, j) {
   var row = this._cells[i];
   if (!row) return;
   return row[j];
+};
+
+Table.prototype.getRectForCell = function (cell) {
+  return cell.getBoundingClientRect();
+};
+
+Table.prototype.deselect = function () {
+  if (this.selector) {
+    this._selector.parentNode.removeChild(this._selector);
+    this.selector = null;
+  }
 };
 
 Table.prototype.left = function () {
@@ -150,7 +230,33 @@ Table.prototype.down = function () {
 };
 
 Table.prototype.set = function (i, j, value) {
+  if (Array.isArray(value)) {
+    if (!Array.isArray(value[0])) {
+      return this.set(i, j, [value]);
+    }
+    var nCols = value[0].length;
+    for(var oi = 0; oi < value.length; oi++) {
+      var row = value[oi];
+      for(var oj = 0; oj < nCols; oj++) {
+        _setCellValue(this.cell(i + oi, j + oj), row[oj]);
+      }
+    }
+    return;
+  }
   _setCellValue(this.cell(i, j), value);
+};
+
+Table.prototype.getSelectorPosition = function () {
+  console.log('getSelectorPosition', this.selector);
+  if (!this.selector) return;
+  var current = this.selector.target;
+  return {i: current.i, j: current.j};
+};
+
+Table.prototype.setSelectorPosition = function (position) {
+  if (!position) return;
+  var td = this.cell(position.i, position.j);
+  _setSelector.call(this, td);
 };
 
 Table.prototype.edit = function () {

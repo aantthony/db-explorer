@@ -8,6 +8,9 @@ body {
 * {
   -webkit-user-select: none;
 }
+input {
+  -webkit-user-select: text;
+}
 .grid {
   position: relative;
   z-index: 3;
@@ -23,7 +26,6 @@ body {
     height: 32px;
     border: 1px solid #08c;
     input {
-      -webkit-user-select: text;
       font-size: 13px;
       font-family: Helvetica;
       text-align: right;
@@ -56,12 +58,18 @@ body {
     overflow: visible;
     height: 32px;
     direction: ltr;
+    &:first-child {
+      td {
+        background: #f8f8f8;
+        border-bottom-color: #fff;
+      }
+    }
   }
 
   td {
+    white-space: nowrap;
     color: #000000;
     text-align: right;
-    white-space: normal;
     border-width: 0 1px 1px 0;
     
     overflow: hidden;
@@ -73,7 +81,7 @@ body {
     background-color: #fff;
     padding: 8px 8px;
     
-    width: 100px;
+    width: 130px;
     
     &.selected {
       border-color: red;
@@ -82,3 +90,61 @@ body {
   
 }
 
+
+
+
+columnpopup {
+  display: block;
+  background: rgba(255,255,255,0.8);
+  width: 300px;
+  height: 600px;
+  z-index: 300;
+  font-size: 13px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-shadow: 0px 3px 5px rgba(0,0,0,0.1);
+  -webkit-transition: opacity 0.05s ease-out;
+  opacity: 0.0;
+  &.active {
+    opacity: 1.0;
+  }
+  input {
+    position: absolute;
+    top: -32px;
+    left: 0;
+    width: 115px;
+    height: 32px;
+    border: none;
+    outline: none;
+    padding: 8px;
+    box-sizing: border-box;
+    font-size: 13px;
+    font-family: Helvetica;
+    background: #FDFDFD;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    li {
+      padding: 8px 12px;
+    }
+    
+    li.active {
+      background: #08c;
+      color: white;
+    }
+
+  }
+}
+
+.columnpopup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.2);
+  z-index: 299;
+}
